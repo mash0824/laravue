@@ -21,6 +21,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Validator;
+use Yajra\DataTables\DataTables;
 
 /**
  * Class UserController
@@ -141,6 +142,66 @@ class UserController extends BaseController
             $user->email = $email;
             $user->save();
             return new UserResource($user);
+        }
+    }
+
+    /**
+     * get
+     *
+     * @author ASJP
+     * @param Request $request
+     * @return Datatables|\Illuminate\Http\JsonResponse
+     */
+    public function usersDatatables()
+    {
+        return datatables()->collection(User::all())->toJson();
+    }
+
+    /**
+     * Update the password for the specified resource in storage.
+     *
+     * @author ASJP
+     * @param Request $request
+     * @param User    $user
+     * @return UserResource|\Illuminate\Http\JsonResponse
+     */
+    public function updatePassword(Request $request, User $user)
+    {
+        if ($user === null) {
+            return response()->json(['error' => 'User not found'], 404);
+        }
+        if ($user->isAdmin()) {
+            return response()->json(['error' => 'Admin can not be modified'], 403);
+        }
+
+        $currentUser = Auth::user();
+        if (!$currentUser->isAdmin()
+            && $currentUser->id !== $user->id
+            && !$currentUser->hasPermission(\App\Laravue\Acl::PERMISSION_USER_MANAGE)
+        ) {
+            return response()->json(['error' => 'Permission denied'], 403);
+        }
+
+        $validator = Validator::make(
+            $request->all(),
+            [
+                'password' => 'required',
+                'newPassword' => ['required', 'min:6','different:password','confirmed'],
+                'newPassword_confirmation' => 'same:newPassword',
+            ]
+        );
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        } else {
+            $params = $request->all();
+            if (!Hash::check($params['password'], $user->password)) {
+                return response()->json(['errors' => 'Please make sure you enter the correct current password'], 422);
+            }
+            else {
+                $user->password = Hash::make($params['newPassword']);
+                $user->save();
+                return new UserResource($user);
+            }
         }
     }
 

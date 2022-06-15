@@ -12,6 +12,15 @@ import '@/permission'; // permission control
 
 import * as filters from './filters'; // global filters
 
+import 'datatables.net-bs4';
+import 'jszip';
+import 'pdfmake';
+import 'datatables.net-buttons-bs4';
+import 'datatables.net-buttons/js/buttons.colVis';
+import 'datatables.net-buttons/js/buttons.flash';
+import 'datatables.net-buttons/js/buttons.html5';
+import 'datatables.net-buttons/js/buttons.print';
+
 Vue.use(ElementUI, {
   size: Cookies.get('size') || 'medium', // set element-ui default size
   i18n: (key, value) => i18n.t(key, value),

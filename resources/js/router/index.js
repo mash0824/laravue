@@ -79,6 +79,30 @@ export const constantRoutes = [
     component: () => import('@/views/error-page/401'),
     hidden: true,
   },
+  /**
+   * add public_page
+   */
+  {
+    path: '/public_page',
+    component: () => import('@/exam/public-page/Index'),
+    hidden: true,
+  },
+  /**
+   * add private_page
+   */
+  {
+    path: '/private_page',
+    component: () => import('@/exam/private-page/Edit'),
+    hidden: true,
+  },
+  /**
+   * add private_users
+   */
+  {
+    path: '/private_users',
+    component: () => import('@/exam/private-users/View'),
+    hidden: true,
+  },
   {
     path: '',
     component: Layout,
